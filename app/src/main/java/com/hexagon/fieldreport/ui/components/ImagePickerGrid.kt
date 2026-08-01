@@ -40,6 +40,10 @@ fun ImagePickerGrid(
     val addPhotoBgColor = if (isDarkTheme) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
     val addPhotoIconColor = if (isDarkTheme) Color.White else Color.Black
 
+    // Explicit text and accent colors for the OutlinedTextField
+    val textColor = if (isDarkTheme) Color.White else Color.Black
+    val accentColor = if (isDarkTheme) Color.Cyan else Color(0xFF0000FF)
+
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -114,14 +118,17 @@ fun ImagePickerGrid(
                 OutlinedTextField(
                     value = photo.caption,
                     onValueChange = { newCaption -> onCaptionChange(index, newCaption) },
-                    placeholder = { Text("Enter caption...") },
+                    placeholder = { Text("Enter caption...", color = textColor.copy(alpha = 0.6f)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    textStyle = MaterialTheme.typography.bodySmall,
-                    // Forces the text field to use neutral borders instead of purple ones
+                    textStyle = MaterialTheme.typography.bodySmall.copy(color = textColor),
+                    // Forces the text field to use neutral borders and correct text colors based on the theme
                     colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = textColor,
+                        unfocusedTextColor = textColor,
                         unfocusedBorderColor = if (isDarkTheme) Color.White.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.3f),
-                        focusedBorderColor = Color.Cyan
+                        focusedBorderColor = accentColor,
+                        cursorColor = accentColor
                     )
                 )
             }

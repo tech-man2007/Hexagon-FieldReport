@@ -281,7 +281,9 @@ private fun VoiceRecordCard(
     cardBgColor: Color
 ) {
     val context = LocalContext.current
-    var recordingState by remember { mutableIntStateOf(0) } // 0: Ready, 1: Recording, 2: Recorded (Playable)
+    var recordingState by remember { mutableIntStateOf(0) } // 0: Ready, 1: Recording, 2: Recorded
+    var isPlaying by remember { mutableStateOf(false) } // Tracks if audio is actively playing
+
     var mediaRecorder by remember { mutableStateOf<MediaRecorder?>(null) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var audioFilePath by remember { mutableStateOf<String?>(null) }
@@ -331,7 +333,8 @@ private fun VoiceRecordCard(
             val statusText = when (recordingState) {
                 0 -> "Tap to record audio"
                 1 -> "Recording in progress..."
-                else -> "Audio recorded (Tap to play)"
+                2 -> if (isPlaying) "Playing audio..." else "Audio recorded (Tap to play)"
+                else -> ""
             }
             val statusColor = if (recordingState == 1) Color.Red else textColor.copy(alpha = 0.6f)
 
@@ -339,12 +342,14 @@ private fun VoiceRecordCard(
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // Re-record (Refresh) Button
             if (recordingState == 2) {
                 IconButton(
                     onClick = {
                         mediaPlayer?.stop()
                         mediaPlayer?.release()
                         mediaPlayer = null
+                        isPlaying = false
                         recordingState = 0
                     },
                     modifier = Modifier
@@ -364,6 +369,7 @@ private fun VoiceRecordCard(
             val iconTint = if (recordingState == 1) Color.Red else accentColor
             val iconBg = if (recordingState == 1) Color.Red.copy(alpha = 0.15f) else accentColor.copy(alpha = 0.15f)
 
+            // Primary Action Button (Record / Stop / Play / Pause)
             IconButton(
                 onClick = {
                     when (recordingState) {
@@ -404,11 +410,24 @@ private fun VoiceRecordCard(
                         2 -> {
                             audioFilePath?.let { path ->
                                 try {
-                                    mediaPlayer?.release()
-                                    mediaPlayer = MediaPlayer().apply {
-                                        setDataSource(path)
-                                        prepare()
-                                        start()
+                                    if (isPlaying) {
+                                        // Pause Audio
+                                        mediaPlayer?.pause()
+                                        isPlaying = false
+                                    } else {
+                                        // Play or Resume Audio
+                                        if (mediaPlayer == null) {
+                                            mediaPlayer = MediaPlayer().apply {
+                                                setDataSource(path)
+                                                prepare()
+                                                setOnCompletionListener {
+                                                    isPlaying = false
+                                                    seekTo(0) // Reset to beginning when finished
+                                                }
+                                            }
+                                        }
+                                        mediaPlayer?.start()
+                                        isPlaying = true
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -421,17 +440,31 @@ private fun VoiceRecordCard(
                     .size(48.dp)
                     .background(iconBg, CircleShape)
             ) {
-                val currentIcon = when (recordingState) {
-                    0 -> Icons.Default.Add
-                    1 -> Icons.Default.Close // Core icon replacement for Stop
-                    else -> Icons.Default.PlayArrow
+                // Dynamically swap the icon UI based on the state
+                when (recordingState) {
+                    0 -> {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Record", tint = iconTint)
+                    }
+                    1 -> {
+                        // Custom Stop Square
+                        Box(
+                            modifier = Modifier
+                                .size(14.dp)
+                                .background(iconTint, RoundedCornerShape(2.dp))
+                        )
+                    }
+                    2 -> {
+                        if (isPlaying) {
+                            // Custom Pause Bars
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Box(modifier = Modifier.width(4.dp).height(14.dp).background(iconTint, RoundedCornerShape(1.dp)))
+                                Box(modifier = Modifier.width(4.dp).height(14.dp).background(iconTint, RoundedCornerShape(1.dp)))
+                            }
+                        } else {
+                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Play", tint = iconTint)
+                        }
+                    }
                 }
-
-                Icon(
-                    imageVector = currentIcon,
-                    contentDescription = "Voice Log Action",
-                    tint = iconTint
-                )
             }
         }
     }

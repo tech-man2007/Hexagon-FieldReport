@@ -1,7 +1,9 @@
 package com.hexagon.fieldreport.ui.navigation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +12,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hexagon.fieldreport.ui.components.GlassContainer
 
 @Composable
 fun FloatingNavBar(
@@ -28,23 +31,32 @@ fun FloatingNavBar(
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+
+    // 100% Solid Opaque colors so scrolling lists DO NOT bleed through
+    val solidBackgroundColor = if (isDark) Color(0xFF1E272C) else Color.White
+    val solidBorderColor = if (isDark) Color.White.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.05f)
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 24.dp, start = 32.dp, end = 32.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
-        GlassContainer(
-            cornerRadius = 50.dp,
-            modifier = Modifier.height(80.dp)
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp),
+            shape = RoundedCornerShape(50), // Forces the strict rounded pill shape
+            color = solidBackgroundColor,
+            border = BorderStroke(1.dp, solidBorderColor),
+            shadowElevation = if (isDark) 0.dp else 16.dp // Heavy shadow to pop off the white screen
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    // 8.dp padding on all sides gives the inner pill room to breathe
-                    .padding(8.dp),
-                // 4.dp spacedBy gives a tiny gap between the 1/3 sections
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 NavItem(Icons.Default.Home, "Home", "dashboard", currentRoute, onNavigate)
@@ -55,7 +67,6 @@ fun FloatingNavBar(
     }
 }
 
-// FIX: Added RowScope to allow mathematical weight distribution
 @Composable
 private fun RowScope.NavItem(
     icon: ImageVector,
@@ -69,34 +80,43 @@ private fun RowScope.NavItem(
 
     val accentColor = if (isDark) Color.Cyan else Color(0xFF0000FF)
     val unselectedColor = if (isDark) Color.White.copy(alpha = 0.7f) else Color.Black.copy(alpha = 0.7f)
-
     val contentColor = if (isSelected) accentColor else unselectedColor
-    val backgroundColor = if (isSelected) accentColor.copy(alpha = 0.15f) else Color.Transparent
+
+    val interactionSource = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
-            // FIX: This forces the engine to calculate exactly Width / 3
             .weight(1f)
-            // FIX: Forces the pill to stretch fully top-to-bottom within the Row's padding
             .fillMaxHeight()
-            .clip(RoundedCornerShape(50.dp))
-            .background(backgroundColor)
-            .clickable { onClick(route) },
+            .clip(RoundedCornerShape(50))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onClick(route) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = contentColor,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
+        // Active tab highlight block
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(50))
+                .background(if (isSelected) accentColor.copy(alpha = 0.15f) else Color.Transparent),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = contentColor,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = label,
             color = contentColor,
             fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
     }
 }

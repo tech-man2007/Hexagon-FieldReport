@@ -37,7 +37,7 @@ fun SettingsScreen(onLogoutClick: () -> Unit) {
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("Profile & Settings", color = textColor) },
+                title = { Text("Profile & Settings", color = textColor, fontSize = 28.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
             )
         }

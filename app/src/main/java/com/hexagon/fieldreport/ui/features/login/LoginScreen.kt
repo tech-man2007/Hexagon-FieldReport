@@ -1,5 +1,6 @@
 package com.hexagon.fieldreport.ui.features.login
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -10,10 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hexagon.fieldreport.R
 import com.hexagon.fieldreport.ui.components.GlassContainer
 
 @Composable
@@ -31,7 +36,9 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
 
     val textColor = if (isDark) Color.White else Color.Black
     val placeholderColor = if (isDark) Color.LightGray else Color.DarkGray
-    val constructionAccent = Color(0xFFFF9800)
+    val constructionAccent = Color(0xFF0000FF)
+
+    val forgotPasswordColor = if (isDark) Color.White else constructionAccent
 
     Box(
         modifier = Modifier
@@ -47,12 +54,34 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 modifier = Modifier.padding(32.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Logo increased by ~5x for a prominent display
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Company Logo",
+                    modifier = Modifier
+                        .size(130.dp)
+                        .padding(bottom = 16.dp)
+                )
+
+                // Hexagon India in Times New Roman (Serif Bold) on line 1
                 Text(
-                    text = "Hexagon Field Report",
+                    text = "Hexagon India",
                     color = textColor,
-                    fontSize = 22.sp,
+                    fontSize = 26.sp,
+                    fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 32.dp)
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 5.dp)
+                )
+
+                // Field Report on line 2
+                Text(
+                    text = "Field Report",
+                    color = textColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
 
                 OutlinedTextField(
@@ -87,7 +116,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                 // Forgot Password Button
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
                     TextButton(onClick = { /* TODO: Forgot Password Logic */ }) {
-                        Text("Forgot Password?", color = constructionAccent, fontSize = 12.sp)
+                        Text("Forgot Password?", color = forgotPasswordColor, fontSize = 12.sp)
                     }
                 }
 
@@ -97,12 +126,12 @@ fun LoginScreen(onLoginSuccess: () -> Unit) {
                     onClick = onLoginSuccess,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = constructionAccent,
-                        contentColor = Color.Black
+                        contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("Secure Login", fontWeight = FontWeight.Bold)
+                    Text("Secure Login", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }

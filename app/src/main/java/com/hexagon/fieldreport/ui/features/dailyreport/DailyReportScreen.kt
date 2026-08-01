@@ -110,7 +110,7 @@ fun DailyReportScreen() {
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             TopAppBar(
-                title = { Text("New Daily Report", color = textColor) },
+                title = { Text("New Daily Report", color = textColor, fontSize = 28.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 )

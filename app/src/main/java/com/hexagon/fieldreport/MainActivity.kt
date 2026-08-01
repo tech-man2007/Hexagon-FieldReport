@@ -24,6 +24,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.hexagon.fieldreport.ui.features.dailyreport.DailyReportScreen
+import com.hexagon.fieldreport.ui.features.export.ExportScreen
 import com.hexagon.fieldreport.ui.features.login.LoginScreen
 import com.hexagon.fieldreport.ui.features.settings.SettingsScreen
 import com.hexagon.fieldreport.ui.navigation.FloatingNavBar
@@ -110,17 +111,18 @@ fun MainAppScaffold(onLogout: () -> Unit) {
                 popExitTransition = { ExitTransition.None }
             ) {
                 composable("dashboard") {
-                    // Applying backgroundModifier to each individual screen blocks the overlap bug
-                    Box(modifier = Modifier.fillMaxSize().then(backgroundModifier), contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Dashboard / Overview",
-                            color = if (isDark) Color.White else Color.Black
-                        )
+                    Box(modifier = Modifier.fillMaxSize().then(backgroundModifier)) {
+                        com.hexagon.fieldreport.ui.features.dashboard.DashboardScreen() // Replaced dummy text
                     }
                 }
                 composable("daily_report") {
                     Box(modifier = Modifier.fillMaxSize().then(backgroundModifier)) {
                         DailyReportScreen()
+                    }
+                }
+                composable("export") {
+                    Box(modifier = Modifier.fillMaxSize().then(backgroundModifier)) {
+                        com.hexagon.fieldreport.ui.features.export.ExportScreen()
                     }
                 }
                 composable("settings") {

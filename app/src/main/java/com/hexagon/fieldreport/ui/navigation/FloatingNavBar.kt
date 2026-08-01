@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,6 +62,7 @@ fun FloatingNavBar(
             ) {
                 NavItem(Icons.Default.Home, "Home", "dashboard", currentRoute, onNavigate)
                 NavItem(Icons.Default.Add, "Report", "daily_report", currentRoute, onNavigate)
+                NavItem(Icons.Default.Share, "Export", "export", currentRoute, onNavigate) // NEW EXPORT TAB
                 NavItem(Icons.Default.Settings, "Settings", "settings", currentRoute, onNavigate)
             }
         }
